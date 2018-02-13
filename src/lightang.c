@@ -44,6 +44,10 @@ static int eval(){
         return getNameric();
     }
 
+    if(*p++ == '+'){
+        return eval() + eval();
+    }
+
     error("invalid character: %c", *p);
 }
 
