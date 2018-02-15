@@ -36,7 +36,7 @@ runtest 'F[+ a 2] F(5)' 7
 runtest 'F[+ a 4] F(F(F(2)))' 14
 runtest 'F[+ a 25] G[F(a)] G(5 10)' 30
 runtest 'F[+ a b] F(5 2)' 7
-#runtest 'F[+ G(1) G(1)] G[+ . .] F()' 4
+runtest 'F[+ G(1) G(1)] G[+ a a] F()' 4
 
 echo "=== print function ==="
 runtest 'PO(+ 1 4)' '5
@@ -46,6 +46,6 @@ echo "=== expect test ==="
 runtest 'PO(+ 1 4' ''
 runtest 'PO + 1 4)' ''
 runtest '+ 1 a' ''
-#runtest 'F[PO(a) F(b + a b)] F(1 1)' ''
+#runtest 'F[PO(a) F(b + a b)] F(1 1)' '' // valid. but segmentation falut
 
 echo OK
