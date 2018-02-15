@@ -51,13 +51,15 @@ static void readUntil(char untilChar, char *buf){
     while(*p != untilChar)
         *buf++ = *p++;
     p++;
-    *buf = '\n';
+    *buf = '\0';
 }
 
 static int evalFunction(char *code, int *args){
     char *originPointer = p;
     p = code; // Replace code to method
-    int val = eval(args);
+    int val;
+    while(*p)
+        val = eval(args);
     p = originPointer; // Reassign pointer
     return val;
 }
