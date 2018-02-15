@@ -13,6 +13,8 @@ static int evalFunction(char *code, int *args);
 static int eval(int *args);
 int getNameric();
 int getCalcResult(int *args);
+int defineFunc(int *args);
+int execFunc(int *args);
 
 
 static char *p;
@@ -67,40 +69,22 @@ static int evalFunction(char *code, int *args){
 static int eval(int *args){
     spaceSkip();
 
-    
-    if (*p == 'P' && p[1] == 'O'){
-        p += 2;
-        expect('(');
-        int val = eval(args);
-        expect(')');
-        printf("%d\n", val);
-        return val;
-    }
+    // Print function
+    if (*p == 'P' && p[1] == 'O')
+        return printValue(args);
 
 
+    // Use valiable
     if('a' <= *p && *p <= 'z')
         return args[*p++ - 'a'];
 
-    if('A' <= *p && *p <= 'Z' && p[1] == '['){
-        char name = *p;
-        p += 2;
-        readUntil(']', func[name - 'A']);
-        return eval(args);
-    }
+    // Function define
+    if('A' <= *p && *p <= 'Z' && p[1] == '[')
+        return defineFunc(args);
 
-    if('A' <= *p && *p <= 'Z' && p[1] == '('){
-        int newArgs[26];
-        char name = *p;
-        p += 2;
-        
-        int i = 0;
-        for(spaceSkip(); *p != ')'; spaceSkip())
-            newArgs[i++] = eval(args);
-
-        expect(')');
-        return evalFunction(func[name - 'A'], newArgs);
-    }
-
+    // Function execute
+    if('A' <= *p && *p <= 'Z' && p[1] == '(')
+        return execFunc(args);
 
     // Nameric
     if(isdigit(*p))
@@ -109,6 +93,7 @@ static int eval(int *args){
     // Operate
     if(strchr("+-*/", *p))
         return getCalcResult(args);
+
 
 
     error("invalid character: %c", *p);
@@ -134,4 +119,33 @@ int getCalcResult(int *args){
     case '*': return x * y;
     case '/': return x / y;
     }
+}
+
+int printValue(int *args){
+    p += 2;
+    expect('(');
+    int val = eval(args);
+    expect(')');
+    printf("%d\n", val);
+    return val;
+}
+
+int defineFunc(int *args){
+    char name = *p;
+    p += 2;
+    readUntil(']', func[name - 'A']);
+    return eval(args);
+}
+
+int execFunc(int *args){
+    int newArgs[26];
+    char name = *p;
+    p += 2;
+    
+    int i = 0;
+    for(spaceSkip(); *p != ')'; spaceSkip())
+        newArgs[i++] = eval(args);
+
+    expect(')');
+    return evalFunction(func[name - 'A'], newArgs);
 }
