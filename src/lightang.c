@@ -3,6 +3,7 @@
 #include<stdarg.h>
 #include<stdlib.h>
 #include<string.h> // silent warning from 'strchr' ...
+#include<stdbool.h>
 
 // Prototype
 static void spaceSkip();
@@ -15,6 +16,10 @@ int getNameric();
 int getCalcResult(int *args);
 int defineFunc(int *args);
 int execFunc(int *args);
+int printValue(char *methodName, int *args);
+
+bool isEqualCode(char *pattern, char *code);
+char *skipCode(char *code, char *pointer);
 
 
 static char *p;
@@ -69,9 +74,14 @@ static int evalFunction(char *code, int *args){
 static int eval(int *args){
     spaceSkip();
 
+    // built-in method
+    if(isEqualCode("print", p))
+        return printValue("print", args);
+
+
     // Print function
     if (*p == 'P' && p[1] == 'O')
-        return printValue(args);
+        return printValue("PO", args);
 
 
     // Use valiable
@@ -121,8 +131,8 @@ int getCalcResult(int *args){
     }
 }
 
-int printValue(int *args){
-    p += 2;
+int printValue(char *methodName, int *args){
+    p = skipCode(methodName, p);
     expect('(');
     int val = eval(args);
     expect(')');
@@ -148,4 +158,24 @@ int execFunc(int *args){
 
     expect(')');
     return evalFunction(func[name - 'A'], newArgs);
+}
+
+
+bool isEqualCode(char *pattern, char *code){
+    while(*pattern){
+        if(*pattern++ != *code++)
+            return false;
+    }
+    
+    return true;
+}
+
+char *skipCode(char *code, char *pointer){
+    while(*code){
+        if(*code != *pointer)
+            error("%s expected: %s", code, pointer);
+        code++;
+        pointer++;
+    }
+    return pointer;
 }
