@@ -48,4 +48,9 @@ runtest 'PO + 1 4)' ''
 runtest '+ 1 a' ''
 #runtest 'F[PO(a) F(b + a b)] F(1 1)' '' // valid. but segmentation falut
 
+echo "=== built-in method print ==="
+runtest 'print(+ 1 2)' '3
+3'
+
+
 echo OK
