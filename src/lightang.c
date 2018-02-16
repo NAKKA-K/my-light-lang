@@ -10,6 +10,7 @@ static void spaceSkip();
 static void error(char *fmt, ...);
 static void expect(char c);
 static void readUntil(char untilChar, char *buf);
+static char *skipUntil(char untilChar, char *code);
 static int evalFunction(char *code, int *args);
 static int eval(int *args);
 int getNameric();
@@ -54,6 +55,16 @@ static void expect(char c){
     p++;
 }
 
+static char *skipUntil(char untilChar, char *code){
+    while(*code){
+        if(*code == untilChar)
+            return code;
+        
+        code++;
+    }
+    error("} expected: EOF");
+}
+
 static void readUntil(char untilChar, char *buf){
     while(*p != untilChar)
         *buf++ = *p++;
@@ -77,6 +88,27 @@ static int eval(int *args){
     // built-in method
     if(isEqualCode("print", p))
         return printValue("print", args);
+
+    if(isEqualCode("if", p)){
+        p = skipCode("if", p);
+
+        expect('(');
+        int val = eval(args);
+        expect(')');
+        spaceSkip();
+
+        expect('{');
+        spaceSkip();
+        if(val){
+            val = eval(args);
+        }else{
+            p = skipUntil('}', p);
+        }
+        spaceSkip();
+        expect('}');
+
+        return val;
+    }
 
 
     // Print function
