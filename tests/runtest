@@ -52,5 +52,12 @@ echo "=== built-in method print ==="
 runtest 'print(+ 1 2)' '3
 3'
 
+echo "=== built-in method if  ==="
+runtest 'if(1){print(1)}' '1
+1'
+runtest 'if(0){print(1)}' '0'
+runtest 'F[+ a b] if(0){print(0)} if(1){ print(F(5 10)) }' '0
+15
+15'
 
 echo OK
