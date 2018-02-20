@@ -6,7 +6,7 @@
 #include<stdbool.h>
 
 // Prototype
-static void spaceSkip();
+static void skipSpace();
 static void error(char *fmt, ...);
 static void expect(char c);
 static void readUntil(char untilChar, char *buf);
@@ -25,6 +25,7 @@ char *skipCode(char *code, char *pointer);
 
 static char *p;
 static char func[26][100];
+static int lineNum = 1;
 
 
 int main(int argc, char **argv){
@@ -36,9 +37,12 @@ int main(int argc, char **argv){
 }
 
 
-static void spaceSkip(){
-    while(isspace(*p))
+static void skipSpace(){
+    while(isspace(*p)){
+        if(*p == '\n')
+            lineNum++;
         p++;
+    }
 }
 
 static void error(char *fmt, ...){
@@ -51,7 +55,7 @@ static void error(char *fmt, ...){
 
 static void expect(char c){
     if(*p != c)
-        error("%c expected: %s", c, p);
+        error("line %d: %c expected: %s", lineNum, c, p);
     p++;
 }
 
@@ -62,7 +66,7 @@ static char *skipUntil(char untilChar, char *code){
         
         code++;
     }
-    error("} expected: EOF");
+    error("line %d: } expected: EOF", lineNum);
 }
 
 static void readUntil(char untilChar, char *buf){
@@ -83,7 +87,7 @@ static int evalFunction(char *code, int *args){
 }
 
 static int eval(int *args){
-    spaceSkip();
+    skipSpace();
 
     // built-in method
     if(isEqualCode("print", p))
@@ -95,16 +99,16 @@ static int eval(int *args){
         expect('(');
         int val = eval(args);
         expect(')');
-        spaceSkip();
+        skipSpace();
 
         expect('{');
-        spaceSkip();
+        skipSpace();
         if(val){
             val = eval(args);
         }else{
             p = skipUntil('}', p);
         }
-        spaceSkip();
+        skipSpace();
         expect('}');
 
         return val;
@@ -138,7 +142,7 @@ static int eval(int *args){
 
 
 
-    error("invalid character: %c", *p);
+    error("line %d: invalid character: %c", lineNum, *p);
 }
 
 
@@ -185,7 +189,7 @@ int execFunc(int *args){
     p += 2;
     
     int i = 0;
-    for(spaceSkip(); *p != ')'; spaceSkip())
+    for(skipSpace(); *p != ')'; skipSpace())
         newArgs[i++] = eval(args);
 
     expect(')');
@@ -205,7 +209,7 @@ bool isEqualCode(char *pattern, char *code){
 char *skipCode(char *code, char *pointer){
     while(*code){
         if(*code != *pointer)
-            error("%s expected: %s", code, pointer);
+            error("line %d: %s expected: %s", lineNum, code, pointer);
         code++;
         pointer++;
     }
