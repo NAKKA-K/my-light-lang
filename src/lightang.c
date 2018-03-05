@@ -137,7 +137,7 @@ static int eval(int *args){
         return getNameric();
 
     // Operate
-    if(strchr("+-*/", *p))
+    if(strchr("+-*/%=", *p))
         return getCalcResult(args);
 
 
@@ -164,6 +164,8 @@ int getCalcResult(int *args){
     case '-': return x - y;
     case '*': return x * y;
     case '/': return x / y;
+    case '%': return x % y;
+    case '=': return x == y;
     }
 }
 
