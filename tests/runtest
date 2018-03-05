@@ -68,4 +68,18 @@ if(F(0 1)){
 15
 15'
 
+runtest '
+F[% a b]
+if(= F(10 15) 0){
+    print(2)
+}
+if(= F(6 3) 0){
+    print(0)
+}
+if(= F(6 5) 0){
+    print(1)
+}
+' '2
+2'
+
 echo OK
